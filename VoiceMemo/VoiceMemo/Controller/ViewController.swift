@@ -79,7 +79,9 @@ class ViewController: UIViewController {
     //MARK: Action
     
     func playStateDidChange() {
-        playButton.isSelected = (currentModel?.isPlaying)!
+        if let currentModel = currentModel {
+            playButton.isSelected = currentModel.isPlaying
+        }
     }
     
     
