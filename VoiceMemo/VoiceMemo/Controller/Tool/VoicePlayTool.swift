@@ -18,35 +18,33 @@ class VoicePlayTool: NSObject , AVAudioPlayerDelegate{
     
     
     var player: AVAudioPlayer?
-    var currentModel: VoiceRecordModel!
+    var currentModel: VoiceRecordModel?
     
     
     
     func playVoice(model: VoiceRecordModel) -> () {
-            //改变上一个model的状态
-            if currentModel != nil  {
-                currentModel.isPlaying = false
-            }
+        //改变上一个model的状态
+        currentModel?.isPlaying = false
+    
+        //改变model状态
+        model.isPlaying = true
+        
+        let ducumentPath = NSHomeDirectory() + "/Documents/" + model.name! + ".caf"
+        let url = URL(fileURLWithPath: ducumentPath)
+        
+        
+        
+        do {
+            player = try AVAudioPlayer(contentsOf: url)
+            player?.prepareToPlay()
+            player?.play()
+            player?.delegate = self
             
-            //改变model状态
-            model.isPlaying = true
-            
-            let ducumentPath = NSHomeDirectory() + "/Documents/" + model.name! + ".caf"
-            let url = URL(fileURLWithPath: ducumentPath)
-            
-            
-            
-            do {
-                player = try AVAudioPlayer(contentsOf: url)
-                player?.prepareToPlay()
-                player?.play()
-                player?.delegate = self
-                
-                currentModel = model
-            }catch {
-                print(error)
-                return
-            }
+            currentModel = model
+        }catch {
+            print(error)
+            return
+        }
         
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "playStateDidChange"), object: nil)
         
@@ -60,12 +58,13 @@ class VoicePlayTool: NSObject , AVAudioPlayerDelegate{
     
     func pauseVoice() -> () {
         player?.pause()
-        currentModel.isPlaying = false
+        
+        currentModel?.isPlaying = false
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "playStateDidChange"), object: nil)
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        currentModel.isPlaying = false
+        currentModel?.isPlaying = false
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "playStateDidChange"), object: nil)
     }
     
